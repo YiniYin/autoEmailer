@@ -71,14 +71,15 @@
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="E-mail" FontWeight="DemiBold"/>
                 <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding NewCustomer.Email, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,5,0,5" Content="Add" Command="{Binding AddNewContactCommand}" MinWidth="60" HorizontalAlignment="Center"/>
+                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,5,0,5" Content="Add" Command="{Binding AddNewCustomerCommand}" MinWidth="60" HorizontalAlignment="Center"/>
             </Grid>
         </Expander>
 
 
-        <Expander Grid.Row="4" Header="Excel File" IsExpanded="True">
+        <Expander Grid.Row="4" Header="Settings" IsExpanded="True">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -88,8 +89,17 @@
                     <ColumnDefinition Width="4"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                
-                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,5,0,5" Content="Add" Command="{Binding AddExcelFileCommand}" MinWidth="60" HorizontalAlignment="Center"/>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Where is Excel" FontWeight="DemiBold"/>
+                <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.ExelPath, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="What is my Email" FontWeight="DemiBold"/>
+                <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.FromEmail, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="SMTP Host" FontWeight="DemiBold"/>
+                <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding Settings.SMTP, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,5,0,5" Content="Save" Command="{Binding SaveSettingsCommand}" MinWidth="60" HorizontalAlignment="Center"/>
             </Grid>
         </Expander>
 

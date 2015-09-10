@@ -18,7 +18,7 @@ namespace Konex.AutoEmailer
             public string body;
         }
 
-        public void SendEmail(Customer customer)
+        public void SendEmail(string toAddress, string name, DateTime nextServiceDate)
         {
             var email = ConstructEmail();
             SendMessage(email);

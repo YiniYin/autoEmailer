@@ -4,13 +4,14 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Windows.Input;
 using Konex.AutoEmailer.Library;
+using PageableDataGrid;
 
 namespace Konex.AutoEmailer
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private Emailer _emailer;
-        private ExcelReader _excelReader;
+        private MainController controller;
+
         private SortablePageableCollection<Customer> _customers;
         public SortablePageableCollection<Customer> Customers
         {
@@ -20,11 +21,9 @@ namespace Konex.AutoEmailer
             }
             set
             {
-                if (_customers != value)
-                {
-                    _customers = value;
-                    SendPropertyChanged(() => Customers);
-                }
+                if (_customers == value) return;
+                _customers = value;
+                SendPropertyChanged(() => Customers);
             }
         }
 
@@ -34,46 +33,67 @@ namespace Konex.AutoEmailer
             get { return _newCustomer; }
             set
             {
-                if (_newCustomer != value)
-                {
-                    _newCustomer = value;
-                    SendPropertyChanged(() => NewCustomer);
-                }
+                if (_newCustomer == value) return;
+                _newCustomer = value;
+                SendPropertyChanged(() => NewCustomer);
+            }
+        }
+
+        private Settings _settings;
+        public Settings Settings
+        {
+            get { return _settings; }
+            set
+            {
+                if (_settings == value) return;
+                _settings = value;
+                SendPropertyChanged(() => Settings);
             }
         }
 
         public ICommand GoToNextPageCommand { get; private set; }
         public ICommand GoToPreviousPageCommand { get; private set; }
         public ICommand RemoveItemCommand { get; private set; }
-        public ICommand AddNewContactCommand { get; private set; }
-        public ICommand AddExcelFileCommand { get; private set; }
+        public ICommand AddNewCustomerCommand { get; private set; }
+        public ICommand SaveSettingsCommand { get; private set; }
         public ICommand SendEmailCommand { get; private set; }
 
         public List<int> EntriesPerPageList
         {
             get
             {
-                return new List<int>() { 5, 10, 15 };
+                return new List<int> { 5, 10, 15 };
             }
         }
 
         public MainWindowViewModel()
-        {       
-            _emailer = new Emailer();
-            _excelReader = new ExcelReader();
-            Customers = new SortablePageableCollection<Customer>(CreateInitialContacts());
+        {  
+            controller = new MainController();
 
-            GoToNextPageCommand = new RelayCommand(a => Customers.GoToNextPage());
-            GoToPreviousPageCommand = new RelayCommand(a => Customers.GoToPreviousPage());
-            RemoveItemCommand = new RelayCommand(item => Customers.Remove(item as Customer));
-            AddNewContactCommand = new RelayCommand(item => AddNewContact());
-            AddExcelFileCommand = new RelayCommand(item => _excelReader.AddExcelFileCommand());
-            SendEmailCommand = new RelayCommand(item => _emailer.SendEmail(item as Customer) );
+            GetCustomers();
+            GetNewCustomerViewModel();
+            SetupCommands();
+        }
 
+        private void GetNewCustomerViewModel()
+        {
             NewCustomer = new Customer();
         }
 
-        #region INotifyPropertyChanged Implementation
+        private void GetCustomers()
+        {
+            Customers = controller.GetCustomers();
+        }
+
+        private void SetupCommands()
+        {
+            GoToNextPageCommand = new RelayCommand(a => Customers.GoToNextPage());
+            GoToPreviousPageCommand = new RelayCommand(a => Customers.GoToPreviousPage());
+            RemoveItemCommand = new RelayCommand(item => Customers.Remove(item as Customer));
+            AddNewCustomerCommand = new RelayCommand(item => controller.AddNewCustomer(item as Customer));
+            SaveSettingsCommand = new RelayCommand(item => controller.SaveSettings(item as Settings));
+            SendEmailCommand = new RelayCommand(item => controller.SendEmail(item as Customer));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void SendPropertyChanged<T>(Expression<Func<T>> expression)
@@ -81,29 +101,6 @@ namespace Konex.AutoEmailer
             if (null != PropertyChanged)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(((MemberExpression)expression.Body).Member.Name));
-            }
-        }
-
-        #endregion
-
-        private IEnumerable<Customer> CreateInitialContacts()
-        {
-            var list = new List<Customer>();
-
-            for (int i = 1; i < 90; i++)
-            {
-                var newContact = new Customer() { Name = "ContactName " + i.ToString("000"), Email = "address" + i.ToString("000") + "@test.com" };
-                list.Add(newContact);
-            }
-            return list;
-        }
-
-        private void AddNewContact()
-        {
-            if (NewCustomer != null && !string.IsNullOrEmpty(NewCustomer.Name) && !string.IsNullOrEmpty(NewCustomer.Email))
-            {
-                Customers.Add(NewCustomer);
-                NewCustomer = new Customer();
             }
         }
     }
