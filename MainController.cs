@@ -47,5 +47,10 @@ namespace PageableDataGrid
                 //NewCustomer = new Customer();
             }
         }
+
+        public Settings GetSettings()
+        {
+            return new Settings();
+        }
     }
 }

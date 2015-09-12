@@ -51,6 +51,15 @@ namespace Konex.AutoEmailer
             }
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void SendPropertyChanged<T>(Expression<Func<T>> expression)
+        {
+            if (null != PropertyChanged)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(((MemberExpression)expression.Body).Member.Name));
+            }
+        }
+
         public ICommand GoToNextPageCommand { get; private set; }
         public ICommand GoToPreviousPageCommand { get; private set; }
         public ICommand RemoveItemCommand { get; private set; }
@@ -70,9 +79,15 @@ namespace Konex.AutoEmailer
         {  
             controller = new MainController();
 
+            GetSettings();
             GetCustomers();
             GetNewCustomerViewModel();
             SetupCommands();
+        }
+
+        private void GetSettings()
+        {
+            Settings = controller.GetSettings();
         }
 
         private void GetNewCustomerViewModel()
@@ -93,15 +108,6 @@ namespace Konex.AutoEmailer
             AddNewCustomerCommand = new RelayCommand(item => controller.AddNewCustomer(item as Customer));
             SaveSettingsCommand = new RelayCommand(item => controller.SaveSettings(item as Settings));
             SendEmailCommand = new RelayCommand(item => controller.SendEmail(item as Customer));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void SendPropertyChanged<T>(Expression<Func<T>> expression)
-        {
-            if (null != PropertyChanged)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(((MemberExpression)expression.Body).Member.Name));
-            }
         }
     }
 }
